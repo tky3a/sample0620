@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tuning Demo - DB Query Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="gradient-text">AI Tuning Demo</span></h1>
+            <p>ORDER BYの罠をAIで解き明かす</p>
+        </header>
+
+        <main>
+            <div class="card control-panel">
+                <div class="query-info">
+                    <h3>Target Query</h3>
+                    <code>SELECT * FROM user_logs WHERE status = 'error' ORDER BY created_at DESC LIMIT 50;</code>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="clear-btn" class="glow-on-hover" style="background: var(--card-bg); border: 1px solid var(--primary); color: var(--text-main);">Clear DB Cache</button>
+                    <button id="run-btn" class="glow-on-hover">Run Query & Get Plan</button>
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="card result-card">
+                    <div class="card-header">
+                        <h2>Execution Time</h2>
+                        <div class="pulse-indicator"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="time-val">--</span> <span class="unit">ms</span>
+                    </div>
+                </div>
+
+                <div class="card plan-card">
+                    <h2>Execution Plan (JSON)</h2>
+                    <pre><code id="plan-json">"Run Query" ボタンを押して実行計画を取得してください...
+（取得したJSONをChatGPT等のAIに貼り付けて「チューニング方法を教えて」と指示するデモを想定しています）</code></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
