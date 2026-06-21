@@ -11,10 +11,15 @@
     <div class="container">
         <header>
             <h1><span class="gradient-text">AI Tuning Demo</span></h1>
-            <p>ORDER BYの罠をAIで解き明かす</p>
+            <p>AIを活用したDBパフォーマンスチューニングのデモ</p>
         </header>
 
-        <main>
+        <div class="tabs">
+            <button class="tab-btn active" data-target="demo1">Demo 1: ORDER BYの罠 (PostgreSQL)</button>
+            <button class="tab-btn" data-target="demo2">Demo 2: 暗黙の型変換 (MySQL)</button>
+        </div>
+
+        <main id="demo1" class="tab-content active">
             <div class="card control-panel">
                 <div class="query-info">
                     <h3>Target Query</h3>
@@ -41,6 +46,72 @@
                     <h2>Execution Plan (JSON)</h2>
                     <pre><code id="plan-json">"Run Query" ボタンを押して実行計画を取得してください...
 （取得したJSONをChatGPT等のAIに貼り付けて「チューニング方法を教えて」と指示するデモを想定しています）</code></pre>
+                </div>
+            </div>
+        </main>
+
+        <main id="demo2" class="tab-content">
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Table Schema: <code>devices</code></h3>
+                <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 0.5rem; font-size: 0.95rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary);">
+                            <th style="padding: 0.75rem;">Column Name</th>
+                            <th style="padding: 0.75rem;">Data Type</th>
+                            <th style="padding: 0.75rem;">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <td style="padding: 0.75rem;"><code>id</code></td>
+                            <td style="padding: 0.75rem;"><code>INT</code></td>
+                            <td style="padding: 0.75rem; color: var(--text-muted);">PRIMARY KEY</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255, 107, 107, 0.1);">
+                            <td style="padding: 0.75rem; color: var(--accent); font-weight: bold;"><code>device_type</code></td>
+                            <td style="padding: 0.75rem; color: var(--accent); font-weight: bold;"><code>VARCHAR(10)</code></td>
+                            <td style="padding: 0.75rem; color: var(--accent);">
+                                <strong>Index あり (罠ポイント)</strong><br>
+                                <span style="font-size: 0.85em; font-weight: normal; color: var(--text-main);">※ 実データは <code>'1'</code>, <code>'99'</code> のように文字列として格納</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem;"><code>data</code></td>
+                            <td style="padding: 0.75rem;"><code>TEXT</code></td>
+                            <td style="padding: 0.75rem; color: var(--text-muted);">ダミーデータ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card control-panel">
+                <div class="query-info">
+                    <h3>Target Query (Go -> MySQL)</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">※ devices.device_type は <code>VARCHAR(10)</code></p>
+                    <pre><code style="background: transparent; border: none; padding: 0;">db.Query(`
+SELECT id, device_type, data FROM devices WHERE device_type = ? LIMIT 50`, 
+99 /* int型で渡す */)</code></pre>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="clear-btn2" class="glow-on-hover" style="background: var(--card-bg); border: 1px solid var(--primary); color: var(--text-main);">Clear DB Cache</button>
+                    <button id="run-btn2" class="glow-on-hover">Run Query & Get Plan</button>
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="card result-card">
+                    <div class="card-header">
+                        <h2>Execution Time</h2>
+                        <div class="pulse-indicator"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="time-val2">--</span> <span class="unit">ms</span>
+                    </div>
+                </div>
+
+                <div class="card plan-card">
+                    <h2>Execution Plan (JSON)</h2>
+                    <pre><code id="plan-json2">"Run Query" ボタンを押して実行計画を取得してください...</code></pre>
                 </div>
             </div>
         </main>

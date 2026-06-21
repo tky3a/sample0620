@@ -14,5 +14,20 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
 
+  mysql:
+    image: mysql:8.0
+    container_name: demo_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: demo_db
+      MYSQL_USER: demo_user
+      MYSQL_PASSWORD: demo_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/mysql_init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+
 volumes:
   postgres_data:
+  mysql_data:
